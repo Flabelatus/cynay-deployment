@@ -1,10 +1,10 @@
 # Run the Caddy Reverse-proxy via Docker
 First execute the following:
-    ```bash
+```bash
         docker pull caddy
-    ```
+```
 Then you can run the pulled image via the following commad:
-    ```bash
+```bash
         docker run -d \
         --name caddy \
         -p 80:80 \
@@ -13,11 +13,12 @@ Then you can run the pulled image via the following commad:
         -v caddy_data:/data \
         -v caddy_config:/config \
         caddy
-    ```
+```
 
 # Install the Supervisor and Run the Application
 After installing the supervisor in ubuntu add the following configs in `/etc/supervisor/conf.d/cynay.conf`
-    ```
+
+```
     [program:cynay]
     command=make run
     directory=/var/www/Cynay-search-engine
@@ -27,7 +28,7 @@ After installing the supervisor in ubuntu add the following configs in `/etc/sup
     stdout_logfile=/var/log/cynay.out.log
     user=ubuntu
     environment=INSTANCE_NAME="cynay",BASE_URL="https://cynay.com"
-    ```
+```
 
 Create the Caddyfile
 ```
