@@ -1,4 +1,14 @@
-# Run the Caddy Reverse-proxy via Docker
+# Deploy the Cynay Search Engine
+***The application is currently on an AWS EC2 Instance***
+located at `/var/www/Cynay-search-engine`
+Within the `/var/www` folder the `reverse-proxy` directory contains the `Caddyfile` for the settings of the
+reverse proxy which we would run inside using a docker image
+
+## Steps to follow:
+
+### Setup Caddy as Reverse-proxy
+
+##### Run the Caddy via Docker
 First execute the following:
 ```bash
 docker pull caddy
@@ -9,28 +19,20 @@ docker run -d \
 --name caddy \
 -p 80:80 \
 -p 443:443 \
--v /var/www/Caddyfile:/etc/caddy/Caddyfile \
+-v /var/www/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile \
 -v caddy_data:/data \
 -v caddy_config:/config \
 caddy
 ```
 
-# Install the Supervisor and Run the Application
-After installing the supervisor in ubuntu add the following configs in `/etc/supervisor/conf.d/cynay.conf`
+To ensure the docker image for caddy is running simply check via `docker ps`
+Also to read it's encyption logs you can check `docker logs caddy`
 
-```
-[program:cynay]
-command=make run
-directory=/var/www/Cynay-search-engine
-autostart=true
-autorestart=true
-stderr_logfile=/var/log/cynay.err.log
-stdout_logfile=/var/log/cynay.out.log
-user=ubuntu
-environment=INSTANCE_NAME="cynay",BASE_URL="https://cynay.com"
-```
+***This would only work once the DNS is configured correctly by pointing at the ip of the server***
 
-Create the Caddyfile
+##### Add the Caddyfile
+
+Create the Caddyfile at `/var/www/reverse-proxy/Caddyfile` with the following content
 ```
 {
   admin off
@@ -131,4 +133,43 @@ cynay.com {
         }
 }
 ```
+
+### Run the Cynay Search Engine Application
+Since the decision was made to not run this instance in a docker, we can run it via the `make run` command inside the ubuntu machine
+However, its best to have it run by the supervisor 
+
+##### Install the Supervisor and Run the Application
+To install the supervisor run: `sudo apt update` and `sudo apt install supervisor -y`
+
+To verify installation run `supervisord --version` and ensure that the supervisor service is running: `sudo systemctl status supervisor`
+
+If its not running start it: `sudo systemctl start supervisor`
+
+After installing the supervisor in ubuntu add the following config file for the cynay project `/etc/supervisor/conf.d/cynay.conf`
+and add the following commands:
+```
+[program:cynay]
+command=make run
+directory=/var/www/Cynay-search-engine
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/cynay.err.log
+stdout_logfile=/var/log/cynay.out.log
+user=ubuntu
+environment=INSTANCE_NAME="cynay",BASE_URL="https://cynay.com"
+```
+After this make sure the supervisor is updated with new config file
+`sudo supervisorctl reread`
+`sudo supervisorctl update`
+
+Then you can start the program:
+`sudo supervisorctl start cynay`
+
+To stop the app run `sudo supervisorctl stop cynay`
+
+Check the status: `sudo supervisorctl status`
+
+You also can read the logs from the `/var/log/cynay.err.log` and `/var/log/cynay.out.log` files
+
+Running this, the application would be started on the `localhost:8080`
 
