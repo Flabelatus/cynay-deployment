@@ -4,11 +4,11 @@ located at `/var/www/Cynay-search-engine`
 Within the `/var/www` folder the `reverse-proxy` directory contains the `Caddyfile` for the settings of the
 reverse proxy which we would run inside using a docker image
 
-## Steps to follow:
+# Steps to follow:
 
-### Setup Caddy as Reverse-proxy
+## Setup Caddy as Reverse-proxy
 
-##### Run the Caddy via Docker
+### Run the Caddy via Docker
 First execute the following:
 ```bash
 docker pull caddy
@@ -30,7 +30,7 @@ Also to read it's encyption logs you can check `docker logs caddy`
 
 ***This would only work once the DNS is configured correctly by pointing at the ip of the server***
 
-##### Add the Caddyfile
+### Add the Caddyfile
 
 Create the Caddyfile at `/var/www/reverse-proxy/Caddyfile` with the following content
 ```
@@ -134,19 +134,19 @@ cynay.com {
 }
 ```
 
-### Run the Cynay Search Engine Application
+## Run the Cynay Search Engine Application
 Since the decision was made to not run this instance in a docker, we can run it via the `make run` command inside the ubuntu machine
 However, its best to have it run by the supervisor 
 
-##### Install the Supervisor and Run the Application
-To install the supervisor run: `sudo apt update` and `sudo apt install supervisor -y`
+### Install the Supervisor and Run the Application
+1. To install the supervisor run: `sudo apt update` and `sudo apt install supervisor -y`
 
-To verify installation run `supervisord --version` and ensure that the supervisor service is running: `sudo systemctl status supervisor`
+2. To verify installation run `supervisord --version` and ensure that the supervisor service is running: `sudo systemctl status supervisor`
 
-If its not running start it: `sudo systemctl start supervisor`
+3. If its not running start it: `sudo systemctl start supervisor`
 
-After installing the supervisor in ubuntu add the following config file for the cynay project `/etc/supervisor/conf.d/cynay.conf`
-and add the following commands:
+4. After installing the supervisor in ubuntu add the following config file for the cynay project `/etc/supervisor/conf.d/cynay.conf`
+5. Then add the following commands:
 ```
 [program:cynay]
 command=make run
@@ -158,18 +158,17 @@ stdout_logfile=/var/log/cynay.out.log
 user=ubuntu
 environment=INSTANCE_NAME="cynay",BASE_URL="https://cynay.com"
 ```
-After this make sure the supervisor is updated with new config file
+6. After this make sure the supervisor is updated with new config file
 `sudo supervisorctl reread`
 `sudo supervisorctl update`
 
-Then you can start the program:
+7. Then you can start the program:
 `sudo supervisorctl start cynay`
 
-To stop the app run `sudo supervisorctl stop cynay`
+***Note:*** 
 
-Check the status: `sudo supervisorctl status`
-
-You also can read the logs from the `/var/log/cynay.err.log` and `/var/log/cynay.out.log` files
-
-Running this, the application would be started on the `localhost:8080`
+- To stop the app run `sudo supervisorctl stop cynay`
+- Check the status: `sudo supervisorctl status`
+- You also can read the logs from the `/var/log/cynay.err.log` and `/var/log/cynay.out.log` files
+- Running this, the application would be started on the `localhost:8080`
 
