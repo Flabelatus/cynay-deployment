@@ -16,6 +16,7 @@ docker pull caddy
 Then you can run the pulled image via the following commad:
 ```bash
 docker run -d \
+--network=host \
 --name caddy \
 -p 80:80 \
 -p 443:443 \
@@ -38,7 +39,7 @@ Create the Caddyfile at `/var/www/reverse-proxy/Caddyfile` with the following co
   admin off
 }
 
-cynay.com {
+cynay.com, www.cynay.com {
 
         log {
                 output discard
@@ -126,6 +127,7 @@ cynay.com {
         handle {
                 encode zstd gzip
                 reverse_proxy localhost:8080 {
+                        header_up Host {http.request.host}
                         header_up X-Forwarded-Port {http.request.port}
                         header_up X-Forwarded-Proto {http.request.scheme}
                         header_up X-Real-IP {remote_host}
